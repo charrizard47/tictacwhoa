@@ -24,12 +24,12 @@ body {
     font-size: 24px;
     font-weight: bold;
     line-height: 34px;
-    height: 34px;
+    height: 64px;
     margin-right: -1px;
     margin-top: -1px;
     padding: 0;
     text-align: center;
-    width: 34px;
+    width: 64px;
   }
   
   .square:focus {
@@ -48,7 +48,12 @@ body {
   .game-info {
     margin-left: 20px;
   }
-  
-  .blue{
-    background: #00f;
+
+  .game-description{
+    margin-left: 30px;
+  }
+
+  .pieces{
+    height: 64px;
+    width: 64px;
   }

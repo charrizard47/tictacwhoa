@@ -3,6 +3,17 @@ import ReactDOM from 'react-dom';
 
 class Board extends React.Component { //board
 
+  renderRow(i) {
+    var row = i;
+    const result = [];
+
+    for (row; row<i+8 ; row++) {
+      result.push(this.renderSquare(row));
+    }
+    return result;
+    
+  }
+
   renderSquare(i) { //render square method takes in a number
     if (this.props.winningTiles != null && (
         (i == this.props.winningTiles[0] || 
@@ -13,14 +24,19 @@ class Board extends React.Component { //board
         <Square 
           value ={this.props.squares[i]}
           color= 'blue'
-          onClick={() => this.props.onClick(i)}/>
+          onClick={() => this.props.onClick(i)}
+          test = {i}
+        />
+          
       )
     } else {
       return (
       <Square 
-        value ={this.props.squares[i]}
+        source ={this.props.squares[i]}
         color= 'white'
-        onClick={() => this.props.onClick(i)}/>
+        onClick={() => this.props.onClick(i)}
+        test = {i}
+        />
       );
     }
   }
@@ -31,29 +47,46 @@ class Board extends React.Component { //board
     return (
       <div>
         <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
+          {this.renderRow(1)}
         </div>
         <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
+          {this.renderRow(9)}
         </div>
         <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
+          {this.renderRow(17)}
         </div>
+        <div className="board-row">
+          {this.renderRow(25)}
+        </div>
+        <div className="board-row">
+          {this.renderRow(33)}
+        </div>
+        <div className="board-row">
+          {this.renderRow(41)}
+        </div>
+        <div className="board-row">
+          {this.renderRow(49)}
+        </div>
+        <div className="board-row">
+          {this.renderRow(57)}
+        </div>
+        
+
+
+
+
+
+
       </div>
     );
   }
 }
 
 function Square(props) {
+  //<img className={'pieces'} src={props.source}/> 
   return (
-      <button className={'square ' + props.color } onClick={props.onClick}>
-          {props.value}
+      <button className={"square"} onClick={props.onClick}>
+        <img className={'pieces'} src={props.source}/> 
       </button>
   )
 }
