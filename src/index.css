@@ -11,6 +11,7 @@ body {
     clear: both;
     content: "";
     display: table;
+
   }
   
   .status {
@@ -18,7 +19,7 @@ body {
   }
   
   .square {
-    background: #fff;
+    background: #EAFF83;
     border: 1px solid #999;
     float: left;
     font-size: 24px;
@@ -30,6 +31,7 @@ body {
     padding: 0;
     text-align: center;
     width: 64px;
+    
   }
   
   .square:focus {
@@ -44,16 +46,39 @@ body {
     display: flex;
     flex-direction: row;
   }
+
+  .game-board {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
   
   .game-info {
-    margin-left: 20px;
+
   }
 
-  .game-description{
-    margin-left: 30px;
+  .game-rules{
+    position: absolute;
+    top: 20%;
+    left: 5%;
   }
 
-  .pieces{
+  .game-next-piece{
+    top: 20%;
+    position: absolute;
+    right: 20%
+  }
+
+  .next-piece{
     height: 64px;
     width: 64px;
   }
+
+  .score{
+    position: absolute;
+    top: 40%;
+    left: 5%;
+  }
+
+  

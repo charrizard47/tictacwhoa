@@ -15,21 +15,6 @@ class Board extends React.Component { //board
   }
 
   renderSquare(i) { //render square method takes in a number
-    if (this.props.winningTiles != null && (
-        (i == this.props.winningTiles[0] || 
-        i == this.props.winningTiles[1] || 
-        i == this.props.winningTiles[2]))){
-      //make winning tile yellow
-      return (
-        <Square 
-          value ={this.props.squares[i]}
-          color= 'blue'
-          onClick={() => this.props.onClick(i)}
-          test = {i}
-        />
-          
-      )
-    } else {
       return (
       <Square 
         source ={this.props.squares[i]}
@@ -38,7 +23,6 @@ class Board extends React.Component { //board
         test = {i}
         />
       );
-    }
   }
 
   

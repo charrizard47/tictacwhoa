@@ -25,8 +25,11 @@ class Game extends React.Component { //game just calls board and stores history 
         squares: Array(64).fill(null),
       }],
       stepNumber: 0,
-      redIsNext: true,
-      nextPiece: this.generateFirstPiece()[0],
+      redIsNext: false,
+      nextPiece: this.generateFirstPiece(),
+      boardValue: Array(65).fill(0),
+      playerOneScore: 0,
+      playerTwoScore: 0,
 
     };
   }
@@ -36,19 +39,27 @@ class Game extends React.Component { //game just calls board and stores history 
     const history = this.state.history.slice(0, this.state.stepNumber +1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
-        return;
-    }
-    squares[i] = this.state.nextPiece;
+    const squaresValue = this.state.boardValue.slice();
 
-    this.setState({
-      history: history.concat([{
-        squares: squares,
-      }]),
-      stepNumber: history.length,
-      redIsNext: !this.state.redIsNext,
-      nextPiece: this.generatePiece()[0],
-    });
+    if (squaresValue[i] == 0) {
+      squares[i] = this.state.nextPiece[0];
+      squaresValue[i] = this.state.nextPiece[1];
+
+      this.calculateScore(squaresValue);
+
+
+      this.setState({
+        history: history.concat([{
+          squares: squares,
+        }]),
+        stepNumber: history.length,
+        redIsNext: !this.state.redIsNext,
+        nextPiece: this.generatePiece(),
+        boardValue: squaresValue,
+      });
+    }
+    
+    
   }
 
   //handles what happens when a move is clicked
@@ -134,13 +145,23 @@ class Game extends React.Component { //game just calls board and stores history 
 
   }
 
+  calculateScore(v) {
+    
+    const one = calculateWestRed(v) + calculateEastWestRed(v) + calculateSouthWestRed(v) + calculateEastRed(v);
+    const two = calculateWestBlue(v) + calculateEastWestBlue(v) + calculateSouthWestBlue(v) + calculateEastBlue(v);
+    this.setState ({
+      playerOneScore: one,
+      playerTwoScore: two,
+    });
+  }
+
   
   render() {
 
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
-    const winningTiles = calculateWinningTiles(current.squares);
+    const winner = calculateWinner(this.state.playerOneScore, this.state.playerTwoScore, this.state.history.length);
+    
   
     const moves = history.map((step, move) => {
       const desc = move ?
@@ -155,43 +176,39 @@ class Game extends React.Component { //game just calls board and stores history 
 
     let status;
     if(winner) {
-      status = 'Winner is: ' + winner;
-    } else if (this.state.stepNumber === 9) {
-      status = 'Draw';
+      status = winner;
     } else {
-      status = (this.state.redIsNext ? 'Player 1' : 'Player 2');
+      status = (this.state.redIsNext ? 'Player 2 turn' : 'Player 1 turn');
     }
 
     return (
       <div className="game">
+
         <div className="game-board">
-          <Board 
+          <Board className="board"
             squares={current.squares}
-            winningTiles={winningTiles}
             onClick={(i)=> this.handleClick(i)}
           />
         </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ol>{/*moves*/}</ol>
-        </div>
-        <div className="game-description">
+
+        
+
+        <div className="game-rules">
           <Rule/>
         </div>
 
-        <div>
-          <img className="pieces" src={this.state.nextPiece}/>
+        <div className="game-next-piece">
+        <div className="game-info">
+          <div>{status}</div>
         </div>
+          {"Next piece:"}
+          <img className="next-piece" src={this.state.nextPiece[0]}/>
+        </div> 
 
-
-        <div>
-          <ol>
-            {/*current.squares.map(squares => <li>{squares}</li>)*/}
-          </ol>        
-            
+        <div className="score">
+          <div>{"Player 1 score: " + this.state.playerOneScore} </div>
+          <div>{"Player 2 score: " + this.state.playerTwoScore}</div>
         </div>
-
-        
 
       </div>
     );
@@ -199,49 +216,142 @@ class Game extends React.Component { //game just calls board and stores history 
 }
 
 // finds the winner
-function calculateWinner(squares) {
-  /*
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      //i think this is the place to make the winning squares yellow
-      return squares[a];
+function calculateWinner(one, two, moves) {
+  if (moves == 65) {
+    var winner = "";
+    if (one > two) {
+      winner = "Player 1 wins!"
+    } else if (one < two) {
+      winner = "Player 2 wins!"
+    } else {
+      winner = "Its a draw!"
     }
+    return winner;
+  } else {
+    return null;
   }
-  return null;*/
+  
+  
 }
 
-// finds the winning tiles
-function calculateWinningTiles(squares) {
-  /*const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      //i think this is the place to make the winning squares yellow
-      return lines[i];
+
+
+function calculateEastRed(squaresValue) {
+   var result = 0;
+    for (var i=0; i<48; i++) {
+        if((squaresValue[i] == 1 || squaresValue[i] == 3 || squaresValue[i] == 7) &&
+           (squaresValue[i+8] == 1 || squaresValue[i+8] == 3 || squaresValue[i+8] == 7) &&
+           (squaresValue[i+16] == 1 || squaresValue[i+16] == 3 || squaresValue[i+16] == 7)) {
+          result++;
+        }
+    }
+
+   return result;
+}
+
+function calculateWestRed(squaresValue) {
+  var result = 0;
+    for (var i=0; i<62; i++) {
+      if ((i+3)% 8 >0) {
+        if((squaresValue[i] == 1 || squaresValue[i] == 3 || squaresValue[i] == 7) &&
+          (squaresValue[i+1] == 1 || squaresValue[i+1] == 3 || squaresValue[i+1] == 7) &&
+          (squaresValue[i+2] == 1 || squaresValue[i+2] == 3 || squaresValue[i+2] == 7)) {
+          result++;
+        }
+      }
+    }
+
+   return result;
+}
+
+function calculateEastWestRed(squaresValue) {
+  var result = 0;
+   for (var i=0; i<squaresValue.length; i++) {
+     if (i<46) {
+       if((squaresValue[i] == 2 || squaresValue[i] == 3 || squaresValue[i] == 8) &&
+          (squaresValue[i+9] == 2 || squaresValue[i+9] == 3 || squaresValue[i+9] == 8) &&
+          (squaresValue[i+18] == 2 || squaresValue[i+18] == 3 || squaresValue[i+18] == 8)) {
+         result++;
+       }
+     }
+   }
+  return result;
+}
+
+function calculateSouthWestRed(squaresValue) {
+  var result = 0;
+   for (var i=0; i<squaresValue.length; i++) {
+     if (i<48) {
+       if((squaresValue[i] == 2 || squaresValue[i] == 3 || squaresValue[i] == 8) &&
+          (squaresValue[i+7] == 2 || squaresValue[i+7] == 3 || squaresValue[i+7] == 8) &&
+          (squaresValue[i+14] == 2 || squaresValue[i+14] == 3 || squaresValue[i+14] == 8)) {
+         result++;
+       }
+     }
+   }
+  return result;
+}
+
+function calculateEastBlue(squaresValue) {
+  var result = 0;
+   for (var i=0; i<48; i++) {
+       if((squaresValue[i] == 4 || squaresValue[i] == 6 || squaresValue[i] == 7) &&
+          (squaresValue[i+8] == 4 || squaresValue[i+8] == 6 || squaresValue[i+8] == 7) &&
+          (squaresValue[i+16] == 4 || squaresValue[i+16] == 6 || squaresValue[i+16] == 7)) {
+         result++;
+       }
+   }
+
+  return result;
+}
+
+function calculateWestBlue(squaresValue) {
+ var result = 0;
+   for (var i=0; i<62; i++) {
+     if ((i+3)% 8 >0) {
+       if((squaresValue[i] == 4 || squaresValue[i] == 6 || squaresValue[i] == 7) &&
+         (squaresValue[i+1] == 4 || squaresValue[i+1] == 6 || squaresValue[i+1] == 7) &&
+         (squaresValue[i+2] == 4 || squaresValue[i+2] == 6|| squaresValue[i+2] == 7)) {
+         result++;
+       }
+     }
+   }
+
+  return result;
+}
+
+function calculateEastWestBlue(squaresValue) {
+ var result = 0;
+  for (var i=0; i<squaresValue.length; i++) {
+    if (i<46) {
+      if((squaresValue[i] == 5 || squaresValue[i] == 6 || squaresValue[i] == 8) &&
+         (squaresValue[i+9] == 5 || squaresValue[i+9] == 6 || squaresValue[i+9] == 8) &&
+         (squaresValue[i+18] == 5 || squaresValue[i+18] == 6 || squaresValue[i+18] == 8)) {
+        result++;
+      }
     }
   }
-  return null;*/
-
+ return result;
 }
+
+function calculateSouthWestBlue(squaresValue) {
+ var result = 0;
+  for (var i=0; i<squaresValue.length; i++) {
+    if (i<48) {
+      if((squaresValue[i] == 5 || squaresValue[i] == 6 || squaresValue[i] == 8) &&
+         (squaresValue[i+7] == 5 || squaresValue[i+7] == 6 || squaresValue[i+7] == 8) &&
+         (squaresValue[i+14] == 5 || squaresValue[i+14] == 6 || squaresValue[i+14] == 8)) {
+        result++;
+      }
+    }
+  }
+ return result;
+}
+
+
+
+
+
+
 
 export default Game;
