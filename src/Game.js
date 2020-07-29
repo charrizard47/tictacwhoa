@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Board from './Board';
 import Rule from './Rule.js';
 import red_plus from './pieces/red_plus.png';
@@ -239,9 +238,9 @@ function calculateWinner(one, two, moves) {
 function calculateEastRed(squaresValue) {
    var result = 0;
     for (var i=0; i<48; i++) {
-        if((squaresValue[i] == 1 || squaresValue[i] == 3 || squaresValue[i] == 7) &&
-           (squaresValue[i+8] == 1 || squaresValue[i+8] == 3 || squaresValue[i+8] == 7) &&
-           (squaresValue[i+16] == 1 || squaresValue[i+16] == 3 || squaresValue[i+16] == 7)) {
+        if((squaresValue[i] === 1 || squaresValue[i] === 3 || squaresValue[i] === 7) &&
+           (squaresValue[i+8] === 1 || squaresValue[i+8] === 3 || squaresValue[i+8] === 7) &&
+           (squaresValue[i+16] === 1 || squaresValue[i+16] === 3 || squaresValue[i+16] === 7)) {
           result++;
         }
     }
